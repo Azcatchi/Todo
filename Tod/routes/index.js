@@ -1,6 +1,27 @@
 const express = require('express');
 var router = express.Router();
-const UserFct = require('../models/users/users.js');
+const UserFct = require('../models/users.js');
+
+
+
+router.use(function(req, res, next)
+{
+  console.log(req.cookies);
+  if(req.cookies.accessToken)
+  {
+    UserFct.checkCookieIntoDatabase(req.cookies).then((isValid) => {
+      if(isValid)
+      {
+        res.redirect("/todos");
+      } else {
+        res.clearCookie("accessToken");
+        res.redirect("/?session=false");
+      }
+
+    });
+  }
+    next();
+});
 
 /* GET users listing. */
 router.get('/', function(req, res, next) {
@@ -12,6 +33,9 @@ router.get('/', function(req, res, next) {
   }
   else if(req.query.valid == "false") {
     success = "Une erreur est survenue, veuillez réesayer";
+  }
+  else if(req.query.session == "false") {
+    success = "Votre session est expirée ! Veuillez-vous reconnecter";
   }
 
   res.render('index', { success });
@@ -27,10 +51,6 @@ router.get('/create', function(req, res, next) {
   res.render('users/create', { error });
 });
 
-router.get('/todos', function(req, res, next) {
-  res.cookie('tame',"tonper").send('cookie is set');
-  console.log(req.cookies);
-});
 
 router.post('/create', function(req, res, next) {
   if (!req.body.username || req.body.username === '' ||!req.body.password || req.body.password === '' ||!req.body.role || req.body.role === '') {
@@ -45,12 +65,18 @@ router.post('/create', function(req, res, next) {
 });
 
 router.post('/login', function(req, res, next) {
-
   if (!req.body.username || req.body.username === '' ||!req.body.password || req.body.password === '') {
     res.redirect('/?valid=false');
   }
-  UserFct.findOneUserLogin(req.body).then((token) => {
-    console.log("TAMER",token);
+  UserFct.findOneUserLogin(req.body).then((cookieArray) => {
+    res.format({
+      html : () => {
+        res.cookie('accessToken',cookieArray.accessToken).redirect('/todos');
+      },
+      json : () => {
+        res.send({'accessToken' : cookieArray.accessToken});
+      }
+    });
   });
 });
 

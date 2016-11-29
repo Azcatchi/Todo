@@ -10,6 +10,7 @@ var userSchema = new Schema({
   username: { type: String, required: true, unique: true },
   password: { type: String, required: true },
   role: { type: String, enum: ['admin', 'user'] },
+  teamid: { type: Number },
   date_created: Date,
 });
 
@@ -42,11 +43,14 @@ var exportation = {
                   if(!err)
                   {
                     let token = buffer.toString('hex');
+                    let cookieArray = {
+                      userId : user[0]['_id'],
+                      accessToken : token
+                    };
                     exportation.insertSessionIntoDatabase(user[0]['_id'],token);
-                      resolve(user[0]['_id']+token);
+                      resolve(cookieArray);
                   }
               });
-            console.log("Authentification OK");
           }
       });
     });
@@ -56,11 +60,35 @@ var exportation = {
   {
     let expiresTime = new Date();
     let pipeline = redis.pipeline();
-    let id = require('uuid').v4();
-    pipeline.hmset(`session:${id}`, {userId, accessToken, createdAt:Date.now(), expiresAt:expiresTime.setHours(expiresTime.getHours() + 3)});
-    pipeline.sadd('sessions', id);
+    pipeline.hmset(`session:${accessToken}`, {userId, accessToken, createdAt:Date.now(), expiresAt:expiresTime.setHours(expiresTime.getHours() + 3)});
+    pipeline.sadd('sessions', accessToken);
     return pipeline.exec();
   },
+  checkCookieIntoDatabase : function checkCookieIntoDatabase(params)
+  {
+    let session = {
+      accessToken : "",
+      expiresAt : ""
+    };
+    let pipeline = redis.pipeline();
+    pipeline.hmget(`session:${params.accessToken}`,"accessToken","expiresAt");
+    return pipeline.exec().then((res) => {
+      for(var i in res)
+      {
+        tmpArray = res[i][1];
+        session.accessToken = tmpArray[0];
+        session.expiresAt = tmpArray[1];
+      }
+     return exportation.compareTimeStamp(session);
+    });
+  },
+  compareTimeStamp : function compareTimeStamp(params) {
+    if(Date.now() < params.expiresAt)
+    {
+      return true;
+    }
+    return false;
+  }
 };
 
 module.exports = exportation;
