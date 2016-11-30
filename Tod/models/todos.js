@@ -15,22 +15,6 @@ var todoSchema = new Schema({
 });
 
 var exportation = {
-  getUserIdFromToken: function getUserIdFromToken(params)
-  {
-    let user = {
-      userId : "",
-    };
-    let pipeline = redis.pipeline();
-    pipeline.hmget(`session:${params.accessToken}`,"userId");
-    return pipeline.exec().then((res) => {
-      for(var i in res)
-      {
-        tmpArray = res[i][1];
-        user.userId = tmpArray[0];
-      }
-     return user;
-    });
-  }
 };
 
 module.exports = exportation;
