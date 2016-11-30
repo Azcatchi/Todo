@@ -1,0 +1,15 @@
+extends ../layout
+
+block content
+  .main.container
+    .row
+      .col-md-6.col-md-offset-3
+        h1.display-4.m-b-2 TODOS
+        form(method='POST' action='/add')
+          div.form-group
+            label(for='message') Message
+            input.form-control(type='text' id='message' placeholder='message' name='message')
+
+          button.btn.btn-primary(type='submit') Create Todo
+    .row
+      p #{success}

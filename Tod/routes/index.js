@@ -6,21 +6,18 @@ const UserFct = require('../models/users.js');
 
 router.use(function(req, res, next)
 {
-  console.log(req.cookies);
   if(req.cookies.accessToken)
   {
     UserFct.checkCookieIntoDatabase(req.cookies).then((isValid) => {
       if(isValid)
       {
-        res.redirect("/todos");
+          next();
       } else {
         res.clearCookie("accessToken");
         res.redirect("/?session=false");
       }
-
     });
   }
-    next();
 });
 
 /* GET users listing. */
