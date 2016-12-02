@@ -9,7 +9,7 @@ const Promise = require('bluebird');
 var userSchema = new Schema({
   username: { type: String, required: true, unique: true },
   password: { type: String, required: true },
-  role: { type: String, enum: ['admin', 'user'] },
+  isAdmin: { type: String, enum: [true, false] },
   teamid: { type: Number },
   date_created: Date,
 });
@@ -21,7 +21,7 @@ var exportation = {
     var newUser = User({
       username: postCreateUser.username,
       password: hashPassword,
-      role: postCreateUser.role
+      isAdmin: false
     });
     // save the user
     return newUser.save();
@@ -37,24 +37,27 @@ var exportation = {
     return new Promise(function(resolve,reject)
     {
       User.find({ username: postLogin.username }).exec(function(err, user) {
-        bcrypt.compare(postLogin.password, user[0]['password'], function(err, res) {
-          if(res) {
-               require('crypto').randomBytes(48, function(err, buffer) {
-                  if(!err)
-                  {
-                    let token = buffer.toString('hex');
-                    let cookieArray = {
-                      userId : user[0]['_id'],
-                      accessToken : token
-                    };
-                    exportation.insertSessionIntoDatabase(user[0]['_id'],token);
-                      resolve(cookieArray);
-                  }
-              });
-          }
+        if(user[0] !== undefined)
+        {
+          bcrypt.compare(postLogin.password, user[0]['password'], function(err, res) {
+            if(res) {
+                 require('crypto').randomBytes(48, function(err, buffer) {
+                    if(!err)
+                    {
+                      let token = buffer.toString('hex');
+                      let cookieArray = {
+                        userId : user[0]['_id'],
+                        accessToken : token
+                      };
+                      exportation.insertSessionIntoDatabase(user[0]['_id'],token);
+                        resolve(cookieArray);
+                    }
+                });
+              }
+          });
+        }
       });
     });
-  });
   },
   insertSessionIntoDatabase : function insertSessionIntoDatabase(userId, accessToken)
   {
