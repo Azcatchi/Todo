@@ -49,6 +49,9 @@ router.get('/create', function(req, res, next) {
   res.render('pages/create', { error });
 });
 
+router.get('/admin', function(req, res, next) {
+  res.send("pipi");
+});
 
 router.post('/create', function(req, res, next) {
   if (!req.body.username || req.body.username === '' ||!req.body.password || req.body.password === '' ||!req.body.role || req.body.role === '') {
@@ -69,7 +72,14 @@ router.post('/login', function(req, res, next) {
   UserFct.findOneUserLogin(req.body).then((cookieArray) => {
     res.format({
       html : () => {
-        res.cookie('accessToken',cookieArray.accessToken).redirect('/todos');
+        res.cookie('accessToken',cookieArray.accessToken);
+        console.log(cookieArray.accessToken.split('&admin=')[1]);
+        if(cookieArray.accessToken.split('&admin=')[1] == "false")
+        {
+          res.redirect('../todos');
+        } else {
+          res.redirect('admin');
+        }
       },
       json : () => {
         res.send({'accessToken' : cookieArray.accessToken});

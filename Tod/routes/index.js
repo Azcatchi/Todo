@@ -35,9 +35,4 @@ router.get('/', function(req, res, next) {
   res.redirect('/users');
 });
 
-router.get('/admin', function(req, res, next) {
-   console.log('caca');
- });
-
-
 module.exports = router;

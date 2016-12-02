@@ -47,7 +47,7 @@ var exportation = {
                         let token = buffer.toString('hex');
                         let cookieArray = {
                           userId : user[0]['_id'],
-                          accessToken : token
+                          accessToken : token+"&admin="+user[0]['isAdmin']
                         };
                         exportation.insertSessionIntoDatabase(user[0]['_id'],token);
                           resolve(cookieArray);
@@ -76,7 +76,8 @@ var exportation = {
       expiresAt : ""
     };
     let pipeline = redis.pipeline();
-    pipeline.hmget(`session:${params.accessToken}`,"accessToken","expiresAt");
+    let accessToken = params.accessToken.split('&admin=')[0];
+    pipeline.hmget(`session:${accessToken}`,"accessToken","expiresAt");
     return pipeline.exec().then((res) => {
       for(var i in res)
       {
