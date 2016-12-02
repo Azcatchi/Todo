@@ -4,7 +4,6 @@ const UserFct = require('../models/users.js');
 
 router.use(function(req, res, next)
 {
-  console.log(req.cookies);
   if(req.cookies.accessToken)
   {
     UserFct.checkCookieIntoDatabase(req.cookies).then((isValid) => {
@@ -27,8 +26,8 @@ router.get('/', function(req, res, next) {
    res.send("caca");
 });
 
-router.post('/add', function(req, res, next) {
-  res.render('pages/addTodo', { success: "lol" });
+ router.post('/add', function(req, res, next) {
+   res.render('pages/addTodo', { success: "lol" });
    // Enregistre une todo et on redirige vers todos
 });
 

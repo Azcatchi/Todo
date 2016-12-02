@@ -12,12 +12,6 @@ block content
           div.form-group
             label(for='password') Password
             input.form-control(type='password' id='password' placeholder='Password' name='password')
-          div.form-group
-            label(for='role') Role
-            select.form-control(name='role')
-              option(value='') -- Select --
-              option(value='admin') Admin
-              option(value='user') User
           button.btn.btn-primary(type='submit') Create account
     .row
       p= error

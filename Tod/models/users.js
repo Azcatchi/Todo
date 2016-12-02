@@ -40,23 +40,25 @@ var exportation = {
         if(user[0] !== undefined)
         {
           bcrypt.compare(postLogin.password, user[0]['password'], function(err, res) {
-            if(res) {
-                 require('crypto').randomBytes(48, function(err, buffer) {
-                    if(!err)
-                    {
-                      let token = buffer.toString('hex');
-                      let cookieArray = {
-                        userId : user[0]['_id'],
-                        accessToken : token
-                      };
-                      exportation.insertSessionIntoDatabase(user[0]['_id'],token);
-                        resolve(cookieArray);
-                    }
-                });
-              }
-          });
-        }
-      });
+              if(res) {
+                   require('crypto').randomBytes(48, function(err, buffer) {
+                      if(!err)
+                      {
+                        let token = buffer.toString('hex');
+                        let cookieArray = {
+                          userId : user[0]['_id'],
+                          accessToken : token
+                        };
+                        exportation.insertSessionIntoDatabase(user[0]['_id'],token);
+                          resolve(cookieArray);
+                      }
+                  });
+                }
+            });
+          } else {
+            reject("An error occured");
+          }
+       });
     });
   },
   insertSessionIntoDatabase : function insertSessionIntoDatabase(userId, accessToken)
