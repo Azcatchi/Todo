@@ -4,13 +4,12 @@ const UserFct = require('../models/users.js');
 
 router.use(function(req, res, next)
 {
-  console.log(req.cookies);
   if(req.cookies.accessToken)
   {
     UserFct.checkCookieIntoDatabase(req.cookies).then((isValid) => {
       if(isValid)
       {
-        res.redirect("/todos");
+        next();
       } else {
         res.clearCookie("accessToken");
         res.redirect("/?session=false");
@@ -18,11 +17,10 @@ router.use(function(req, res, next)
 
     });
   }
-    next();
 });
 
  router.get('/', function(req, res, next) {
-   // On affiche les todos assignées à l'utilisateur 
+   // On affiche les todos assignées à l'utilisateur
    // Un boutton pour les modifier -> /edit/:id  Voir pour
    // Checkbox de finition de todo
 
@@ -30,7 +28,7 @@ router.use(function(req, res, next)
  });
 
  router.post('/add', function(req, res, next) {
-   res.send("caca");
+   res.render('pages/addTodo', { success: "lol" });
    // Enregistre une todo et on redirige vers todos
  });
 
