@@ -50,7 +50,12 @@ router.get('/create', function(req, res, next) {
 });
 
 router.get('/admin', function(req, res, next) {
-  res.send("pipi");
+  if(cookieArray.accessToken.split('&admin=')[1] == "true")
+  {
+
+  } else {
+    res.redirect('../todos');
+  }
 });
 
 router.post('/create', function(req, res, next) {
