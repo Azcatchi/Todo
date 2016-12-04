@@ -4,6 +4,7 @@ const UserFct = require('../models/users.js');
 
 
 
+
 // router.use(function(req, res, next)
 // {
 //   if(req.cookies.accessToken)
@@ -20,6 +21,7 @@ const UserFct = require('../models/users.js');
 //     });
 //   }
 // });
+
 
 /* GET users listing. */
 router.get('/', function(req, res, next) {
@@ -78,7 +80,6 @@ router.post('/login', function(req, res, next) {
     res.format({
       html : () => {
         res.cookie('accessToken',cookieArray.accessToken);
-        console.log(req.cookies);
         if(cookieArray.accessToken.split('&admin=')[1] == "false")
         {
           res.redirect('../todos');

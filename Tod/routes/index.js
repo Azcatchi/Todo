@@ -22,6 +22,7 @@ const UserFct = require('../models/users.js');
 //   }
 // });
 
+
 router.get('/', function(req, res, next) {
   console.log('smabite');
   var success = "";
@@ -36,7 +37,6 @@ router.get('/', function(req, res, next) {
   else if(req.query.session == "false") {
     success = "Votre session est expirée ! Veuillez-vous reconnecter";
   }
-
 });
 
 module.exports = router;
