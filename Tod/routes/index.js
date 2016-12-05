@@ -1,30 +1,8 @@
 const express = require('express');
 var router = express.Router();
-const UserFct = require('../models/users.js');
 
-// router.use(function(req, res, next)
-// {
-//   if(req.cookies.accessToken)
-//   {
-//     UserFct.checkCookieIntoDatabase(req.cookies).then((isValid) => {
-//       if(isValid)
-//       {
-//         next();
-//       } else {
-//         res.clearCookie("accessToken");
-//         res.redirect("/?session=false");
-//       }
-//
-//     });
-//   } else {
-//     res.clearCookie("accessToken");
-//     res.redirect('/users');
-//   }
-// });
-
-
+// LOGIN interface
 router.get('/', function(req, res, next) {
-  console.log('smabite');
   var success = "";
 
   if(req.query.valid == "true")
@@ -37,6 +15,8 @@ router.get('/', function(req, res, next) {
   else if(req.query.session == "false") {
     success = "Votre session est expirée ! Veuillez-vous reconnecter";
   }
+
+  res.render('index', { success });
 });
 
 module.exports = router;

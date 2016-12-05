@@ -3,45 +3,6 @@ var router = express.Router();
 const UserFct = require('../models/users.js');
 const TeamFct = require('../models/admin.js');
 
-
-
-
-// router.use(function(req, res, next)
-// {
-//   if(req.cookies.accessToken)
-//   {
-//     UserFct.checkCookieIntoDatabase(req.cookies).then((isValid) => {
-//       if(isValid)
-//       {
-//         next();
-//       } else {
-//         res.clearCookie("accessToken");
-//         res.redirect("/?session=false");
-//       }
-//
-//     });
-//   }
-// });
-
-
-// LOGIN interface
-router.get('/', function(req, res, next) {
-  var success = "";
-
-  if(req.query.valid == "true")
-  {
-    success = "Votre compte a été crée, veuillez vous connecter.";
-  }
-  else if(req.query.valid == "false") {
-    success = "Une erreur est survenue, veuillez réesayer";
-  }
-  else if(req.query.session == "false") {
-    success = "Votre session est expirée ! Veuillez-vous reconnecter";
-  }
-
-  res.render('index', { success });
-});
-
 // RENDER create new user page
 router.get('/create', function(req, res, next) {
   var error = "";
@@ -53,18 +14,6 @@ router.get('/create', function(req, res, next) {
   res.render('pages/create', { error });
 });
 
-// ADMIN interface if true
-router.get('/admin', function(req, res, next) {
-  if(req.cookies !== undefined && req.cookies.accessToken.split('&admin=')[1] == "true")
-  {
-    TeamFct.findTeams().then((teams) => {
-      res.render('pages/admin', { teams });
-    });
-  } else {
-    res.redirect('../todos');
-  }
-});
-
 // CREATE a new user
 router.post('/create', function(req, res, next) {
   if (!req.body.username || req.body.username === '' ||!req.body.password || req.body.password === '') {
@@ -73,9 +22,9 @@ router.post('/create', function(req, res, next) {
   UserFct.insertIntoDatabase(req.body).then((isValid) => {
     if(isValid)
     {
-      res.redirect('/users?valid=true');
+      res.redirect('/?valid=true');
     } else {
-      res.redirect('/users?valid=false');
+      res.redirect('/?valid=false');
     }
   })
 });
@@ -83,7 +32,7 @@ router.post('/create', function(req, res, next) {
 // Connect user and create ACCESSTOKEN
 router.post('/login', function(req, res, next) {
   if (!req.body.username || req.body.username === '' ||!req.body.password || req.body.password === '') {
-    res.redirect('/users?valid=false');
+    res.redirect('/?valid=false');
   }
   UserFct.findOneUserLogin(req.body).then((cookieArray) => {
     res.format({
@@ -101,8 +50,39 @@ router.post('/login', function(req, res, next) {
       }
     });
   }).catch(() => {
-    res.redirect('/users?valid=false');
+    res.redirect('/?valid=false');
   });
+});
+
+router.use(function(req, res, next)
+{
+  if(req.cookies.accessToken)
+  {
+    UserFct.checkCookieIntoDatabase(req.cookies).then((isValid) => {
+      if(isValid)
+      {
+        next();
+      } else {
+        res.clearCookie("accessToken");
+        res.redirect("/?session=false");
+      }
+
+    });
+  } else {
+    res.redirect('/?session=false');
+  }
+});
+
+// ADMIN interface if true
+router.get('/admin', function(req, res, next) {
+  if(req.cookies !== undefined && req.cookies.accessToken.split('&admin=')[1] == "true")
+  {
+    TeamFct.findTeams().then((teams) => {
+      res.render('pages/admin', { teams });
+    });
+  } else {
+    res.redirect('../todos');
+  }
 });
 
 // INSERT new team into database

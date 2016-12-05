@@ -3,22 +3,24 @@ var router = express.Router();
 const UserFct = require('../models/users.js');
 const TodoFct = require('../models/todos.js');
 
-// router.use(function(req, res, next)
-// {
-//   if(req.cookies.accessToken)
-//   {
-//     UserFct.checkCookieIntoDatabase(req.cookies).then((isValid) => {
-//       if(isValid)
-//       {
-//         next();
-//       } else {
-//         res.clearCookie("accessToken");
-//         res.redirect("/?session=false");
-//       }
-//
-//     });
-//   }
-// });
+router.use(function(req, res, next)
+{
+  if(req.cookies.accessToken)
+  {
+    UserFct.checkCookieIntoDatabase(req.cookies).then((isValid) => {
+      if(isValid)
+      {
+        next();
+      } else {
+        res.clearCookie("accessToken");
+        res.redirect("/users?session=false");
+      }
+
+    });
+  } else {
+    res.redirect('/users?session=false');
+  }
+});
 
 router.get('/', function(req, res, next) {
    res.render('pages/indexTodo');
