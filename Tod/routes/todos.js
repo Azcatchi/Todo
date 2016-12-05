@@ -24,6 +24,7 @@ router.get('/', function(req, res, next) {
    res.render('pages/indexTodo');
 });
 
+// Display todos depending if user got a team
 router.get('/user', function(req, res, next) {
    UserFct.checkAccessToken(req.cookies).then((params) => {
       TodoFct.fetchUserTodo(params.userId).then((todoList) => {
@@ -35,6 +36,8 @@ router.get('/user', function(req, res, next) {
       });
    });
 });
+
+// Display team todos
 router.get('/team', function(req, res, next) {
    UserFct.checkAccessToken(req.cookies).then((params) => {
       UserFct.findUserTeamId(params.userId).then((teamId) => {
@@ -50,15 +53,18 @@ router.get('/team', function(req, res, next) {
    });
 });
 
+// Set todo to complete
 router.get('/complete/:todoId', function(req, res, next) {
    TodoFct.updateTodoToComplete(req.params.todoId);
    res.redirect('/todos/'+req.query.redirect);
 });
 
+// Display update todo
 router.get('/modify/:todoId', function(req, res, next) {
    res.render('pages/modifyTodo', { todoId: req.params.todoId, redirect: req.query.redirect });
 });
 
+// Display create todo
 router.get('/create', function(req, res, next) {
    UserFct.checkAccessToken(req.cookies).then((params) => {
       UserFct.findUserTeamId(params.userId).then((teamId) => {
@@ -74,6 +80,8 @@ router.get('/create', function(req, res, next) {
    });
 
 });
+
+// Create todo into database
 router.post('/create', function(req, res, next) {
    if(req.body.messageUser) {
       TodoFct.createSimpleTodo(req.body.userId, "0", req.body.messageUser);
@@ -84,6 +92,8 @@ router.post('/create', function(req, res, next) {
    }
 });
 
+
+// Update todo
 router.post('/modify', function(req, res, next) {
    if(req.body.message && req.body.message != "")
    {

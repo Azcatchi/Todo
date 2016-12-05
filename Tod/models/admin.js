@@ -6,9 +6,11 @@ var teamSchema = new Schema({
   date_created: Date,
 });
 
+Team = mongoose.model('Teams', teamSchema);
+
 var exportation = {
+
   insertIntoDatabase : function insertIntoDatabase(postCreateTeam) {
-    Team = mongoose.model('Teams', teamSchema);
     var newTeam = Team({
       name: postCreateTeam.name,
       date_created: Date.now()
@@ -17,8 +19,6 @@ var exportation = {
     return newTeam.save();
   },
   findTeams : function findTeams() {
-    Team = mongoose.model('Teams', teamSchema);
-
     return new Promise(function(resolve,reject)
     {
       Team.find({}, function(err, teams) {

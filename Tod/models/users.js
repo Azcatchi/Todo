@@ -6,6 +6,8 @@ const Schema = mongoose.Schema;
 const cookieParser = require('cookie-parser');
 const Promise = require('bluebird');
 
+
+// Create userSchema with mongo
 var userSchema = new Schema({
   username: { type: String, required: true, unique: true },
   password: { type: String, required: true },
@@ -14,9 +16,13 @@ var userSchema = new Schema({
   date_created: Date,
 });
 
+
+// Instanciate model
 User = mongoose.model('Users', userSchema);
 
 var exportation = {
+
+  //Insert user into DataBase
   insertIntoDatabase : function insertIntoDatabase(postCreateUser){
     hashPassword = exportation.encryptPassword(postCreateUser.password);
     User = mongoose.model('Users', userSchema);
@@ -30,10 +36,14 @@ var exportation = {
     // save the user
     return newUser.save();
   },
+
+  // Encrypt Password with Bcrypt
   encryptPassword : function encryptPassword(password) {
     var salt = bcrypt.genSaltSync(10);
     return bcrypt.hashSync(password, salt);
   },
+
+  // Fetching all user with no team
   fetchAllUserWithoutTeamId : function fetchAllUserWithoutTeamId() {
     return new Promise(function(resolve,reject)
     {
@@ -47,11 +57,15 @@ var exportation = {
       });
     });
   },
+
+  // Update user information
   updateUser : function updateUser(username, param) {
     return User.update({username: username}, {teamid: param}, function(err, affected, resp) {
         console.log("Update Done");
     });
   },
+
+  // Find user with his username
   findOneUserLogin : function findOneUserLogin(postLogin){
     hashPassword = exportation.encryptPassword(postLogin.password);
     return new Promise(function(resolve,reject)
@@ -81,6 +95,8 @@ var exportation = {
        });
     });
   },
+
+  // Find user with his teamId
   findUsersTeam : function findUsersTeam(teamId){
     return new Promise(function(resolve,reject)
     {
@@ -94,9 +110,13 @@ var exportation = {
       });
     });
   },
+
+  // Find teamId with UserId
   findUserTeamId : function findUserTeamId(userId){
     return User.find({ _id: userId }).exec();
   },
+
+  // Insert session into database
   insertSessionIntoDatabase : function insertSessionIntoDatabase(userId, accessToken)
   {
     let expiresTime = new Date();
@@ -105,6 +125,8 @@ var exportation = {
     pipeline.sadd('sessions', accessToken);
     return pipeline.exec();
   },
+
+  // checking accesToken
   checkAccessToken : function checkAccessToken(params)
   {
     let user = { userId: "" };
@@ -120,6 +142,8 @@ var exportation = {
      return user;
     });
   },
+
+  // checking cookie into database
   checkCookieIntoDatabase : function checkCookieIntoDatabase(params)
   {
     let session = {
@@ -139,6 +163,8 @@ var exportation = {
      return exportation.compareTimeStamp(session);
     });
   },
+
+  // Check if cookie is valid
   compareTimeStamp : function compareTimeStamp(params) {
     if(Date.now() < params.expiresAt)
     {
