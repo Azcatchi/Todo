@@ -10,9 +10,11 @@ var userSchema = new Schema({
   username: { type: String, required: true, unique: true },
   password: { type: String, required: true },
   isAdmin: { type: String, enum: [true, false] },
-  teamid: { type: Number },
+  teamid: { type: String },
   date_created: Date,
 });
+
+User = mongoose.model('Users', userSchema);
 
 var exportation = {
   insertIntoDatabase : function insertIntoDatabase(postCreateUser){
@@ -21,7 +23,9 @@ var exportation = {
     var newUser = User({
       username: postCreateUser.username,
       password: hashPassword,
-      isAdmin: false
+      isAdmin: false,
+      teamid: 0,
+      date_created: Date.now()
     });
     // save the user
     return newUser.save();
@@ -30,10 +34,26 @@ var exportation = {
     var salt = bcrypt.genSaltSync(10);
     return bcrypt.hashSync(password, salt);
   },
+  fetchAllUserWithoutTeamId : function fetchAllUserWithoutTeamId() {
+    return new Promise(function(resolve,reject)
+    {
+      User.find({}).where('teamid').equals(0).exec(function(err, user) {
+        if(user)
+        {
+          resolve(user);
+        } else {
+          reject(err);
+        }
+      });
+    });
+  },
+  updateUser : function updateUser(username, param) {
+    return User.update({username: username}, {teamid: param}, function(err, affected, resp) {
+        console.log("Update Done");
+    });
+  },
   findOneUserLogin : function findOneUserLogin(postLogin){
     hashPassword = exportation.encryptPassword(postLogin.password);
-    User = mongoose.model('Users', userSchema);
-
     return new Promise(function(resolve,reject)
     {
       User.find({ username: postLogin.username }).exec(function(err, user) {
@@ -61,6 +81,22 @@ var exportation = {
        });
     });
   },
+  findUsersTeam : function findUsersTeam(teamId){
+    return new Promise(function(resolve,reject)
+    {
+      User.find({ teamid: teamId }).exec(function(err, users) {
+        if(users)
+        {
+          resolve(users);
+        } else {
+          reject(err);
+        }
+      });
+    });
+  },
+  findUserTeamId : function findUserTeamId(userId){
+    return User.find({ _id: userId }).exec();
+  },
   insertSessionIntoDatabase : function insertSessionIntoDatabase(userId, accessToken)
   {
     let expiresTime = new Date();
@@ -68,6 +104,21 @@ var exportation = {
     pipeline.hmset(`session:${accessToken}`, {userId, accessToken, createdAt:Date.now(), expiresAt:expiresTime.setHours(expiresTime.getHours() + 3)});
     pipeline.sadd('sessions', accessToken);
     return pipeline.exec();
+  },
+  checkAccessToken : function checkAccessToken(params)
+  {
+    let user = { userId: "" };
+    let pipeline = redis.pipeline();
+    let accessToken = params.accessToken.split('&admin=')[0];
+    pipeline.hmget(`session:${accessToken}`,"userId");
+    return pipeline.exec().then((res) => {
+      for(var i in res)
+      {
+        tmpArray = res[i][1];
+        user.userId = tmpArray[0];
+      }
+     return user;
+    });
   },
   checkCookieIntoDatabase : function checkCookieIntoDatabase(params)
   {

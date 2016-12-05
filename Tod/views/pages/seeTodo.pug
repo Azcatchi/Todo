@@ -1,0 +1,12 @@
+extends ../layout
+
+block content
+  .main.container-fluid
+    .col-md-3
+      h1 TODO LIST
+      each todo in list
+        p #{todo.message} completed the #{todo.completedAt}
+        if !todo.completedAt
+          a(href="/todos/complete/"+todo._id+"?redirect="+page) Complete
+          a(href="/todos/modify/"+todo._id+"?redirect="+page) Modify
+      p #{error}

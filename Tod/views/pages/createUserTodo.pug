@@ -1,0 +1,13 @@
+extends ../layout
+
+block content
+  .main.container
+    .row
+      .col-md-6.col-md-offset-3
+        h1.display-4.m-b-2 TODO
+        form(method='POST' action='create?redirect='+page)
+          div.form-group
+            label(for='message') Message
+            input.form-control(type='hidden' id='userId' value=userId name='userId')
+            input.form-control(type='text' id='messageUser' placeholder='message' name='messageUser')
+          button.btn.btn-primary(type='submit') Create todo

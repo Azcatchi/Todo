@@ -1,0 +1,18 @@
+extends ../layout
+
+block content
+  .main.container-fluid
+    a(href="/users") Connexion page
+    .col-md-3
+      h1 TEAM LIST
+      each team in teams
+        li= team.name
+        a(href="/users/admin/"+team._id) Modify
+    .col-md-3
+      h1 CREATE A TEAM
+
+      form(method='POST' action='/users/admin')
+        div.form-group
+          label(for='name') Team name
+          input.form-control(type='text' id='name' placeholder='name' name='name')
+        button.btn.btn-primary(type='submit') Create

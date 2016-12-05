@@ -1,0 +1,21 @@
+extends ../layout
+
+block content
+  .main.container-fluid
+    a(href="/users/admin") Admin page
+    .col-md-3
+      h1 USER IN TEAM
+      each userInTeam in usersInTeam
+        form(method='POST' action='/users/admin/remove')
+          span= userInTeam.username
+          input(type="hidden" name="username" value=userInTeam.username)
+          input(type="hidden" name="param" value=param)
+          button.btn.btn-primary(type='submit') X
+    .col-md-3
+      h1 FREE AGENTS
+      each freeAgent in freeAgents
+        form(method='POST' action='/users/admin/add')
+          span= freeAgent.username
+          input(type="hidden" name="username" value=freeAgent.username)
+          input(type="hidden" name="param" value=param)
+          button.btn.btn-primary(type='submit') +

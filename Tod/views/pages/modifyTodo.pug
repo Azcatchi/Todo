@@ -1,0 +1,14 @@
+extends ../layout
+
+block content
+  .main.container
+    .row
+      .col-md-6.col-md-offset-3
+        h1.display-4.m-b-2 Todo modify
+        form(method='POST' action='/todos/modify')
+          div.form-group
+            label(for='message') Message
+            input.form-control(type='text' id='message' placeholder='New message goes here' name='message')
+            input.form-control(type='hidden' id='todoId' name='todoId' value=todoId)
+            input.form-control(type='hidden' id='redirect' name='redirect' value=redirect)
+          button.btn.btn-primary(type='submit') Modify
