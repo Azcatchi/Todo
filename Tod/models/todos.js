@@ -6,6 +6,7 @@ const Schema = mongoose.Schema;
 const cookieParser = require('cookie-parser');
 const Promise = require('bluebird');
 
+// Create todoSchema
 var todoSchema = new Schema({
   userId: { type: String },
   teamId: { type: String },
@@ -15,6 +16,8 @@ var todoSchema = new Schema({
   completedAt: { type: Date, default: null },
 });
 
+
+// Instanciate todoSchema
 Todo = mongoose.model('Todos', todoSchema);
 
 var exportation = {
