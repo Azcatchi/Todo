@@ -1,11 +1,10 @@
 const bcrypt = require('bcryptjs');
 const mongoose = require('mongoose');
 const Redis = require('ioredis');
-const redis = new Redis();
+const redis = new Redis(6379, process.env.REDIS_HOST || '127.0.0.1');
 const Schema = mongoose.Schema;
 const cookieParser = require('cookie-parser');
 const Promise = require('bluebird');
-
 
 // Create userSchema with mongo
 var userSchema = new Schema({
